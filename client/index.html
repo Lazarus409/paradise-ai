@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+
+    <title>Paradise AI</title>
+
+    <!-- ========================================
+         Prevent Flash Of Unstyled Content (FOUC)
+         Handles light / dark / system theme
+    ========================================= -->
+    <script>
+      (function () {
+        try {
+          const stored = localStorage.getItem("theme");
+          const systemDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
+
+          let theme = stored || "system";
+
+          if (theme === "system") {
+            theme = systemDark ? "dark" : "light";
+          }
+
+          if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+          }
+
+          // Prevent transitions on first render
+          document.documentElement.classList.add("no-transition");
+          window.addEventListener("load", () => {
+            document.documentElement.classList.remove("no-transition");
+          });
+        } catch (e) {
+          console.warn("Theme initialization failed:", e);
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- Main App Entry -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

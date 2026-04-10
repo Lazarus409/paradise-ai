@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  PAST_DUE
+}
+
+model User {
+  id                String        @id @default(uuid())
+  email             String        @unique
+  password          String
+  theme             String?       @default("system")
+  createdAt         DateTime      @default(now())
+
+  workspaces        Workspace[]   @relation("WorkspaceOwner")
+  memberships       TeamMember[]
+  presentations     Presentation[]
+  subscription      Subscription?
+  usageLogs         UsageLog[]
+}
+
+model Workspace {
+  id            String        @id @default(uuid())
+  name          String
+  createdAt     DateTime      @default(now())
+
+  ownerId       String
+  owner         User          @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+
+  members       TeamMember[]
+  presentations Presentation[]
+  invites Invite[]
+}
+
+model TeamMember {
+  id            String      @id @default(uuid())
+  role          Role        @default(EDITOR)
+
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+
+  workspaceId   String
+  workspace     Workspace   @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId])
+}
+
+model Presentation {
+  id          String   @id @default(uuid())
+  title       String
+  content     Json?
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  isPublic    Boolean  @default(false)
+  shareToken  String?  @unique
+}
+
+model Subscription {
+  id                    String               @id @default(uuid())
+  plan                  Plan                 @default(FREE)
+  status                SubscriptionStatus   @default(INCOMPLETE)
+
+  stripeCustomerId      String?              @unique
+  stripeSubscriptionId  String?              @unique
+
+  userId                String               @unique
+  user                  User                 @relation(fields: [userId], references: [id])
+}
+
+model UsageLog {
+  id        String   @id @default(uuid())
+  month     String   // e.g. "2026-03"
+  count     Int      @default(0)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, month])
+}
+
+model Invite {
+  id          String    @id @default(uuid())
+  email       String
+  token       String    @unique
+  createdAt   DateTime  @default(now())
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+}
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  userId    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
