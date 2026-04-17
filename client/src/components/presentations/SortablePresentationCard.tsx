@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, GripVertical } from "lucide-react";
 
 interface Props {
   presentation: any;
@@ -29,15 +29,21 @@ export default function SortablePresentationCard({
       style={style}
       {...attributes}
       {...listeners}
-      className="hover:shadow-lg transition"
+      className="border-border/70 bg-card/90 transition hover:-translate-y-0.5 hover:shadow-xl"
     >
-      <CardContent className="py-5 flex justify-between items-center">
-        <div>
-          <h3 className="font-semibold">{presentation.title}</h3>
-
-          <p className="text-sm text-muted-foreground">
-            {new Date(presentation.created_at).toLocaleDateString()}
-          </p>
+      <CardContent className="flex items-center justify-between gap-4 py-5">
+        <div className="flex items-start gap-3">
+          <div className="mt-1 rounded-full bg-muted p-2 text-muted-foreground">
+            <GripVertical className="h-4 w-4" />
+          </div>
+          <div>
+            <h3 className="font-semibold">{presentation.title}</h3>
+            <p className="text-sm text-muted-foreground">
+              {new Date(
+                presentation.createdAt || presentation.created_at
+              ).toLocaleDateString()}
+            </p>
+          </div>
         </div>
 
         <div className="flex gap-2">

@@ -25,6 +25,18 @@ enum SubscriptionStatus {
   PAST_DUE
 }
 
+enum BillingProvider {
+  STRIPE
+  MTN_MOBILE_MONEY
+}
+
+enum BillingSessionStatus {
+  PENDING
+  ACTIVE
+  FAILED
+  EXPIRED
+}
+
 model User {
   id                String        @id @default(uuid())
   email             String        @unique
@@ -36,6 +48,7 @@ model User {
   memberships       TeamMember[]
   presentations     Presentation[]
   subscription      Subscription?
+  billingSessions   BillingSession[]
   usageLogs         UsageLog[]
 }
 
@@ -119,4 +132,19 @@ model AuditLog {
   userId    String
   metadata  Json?
   createdAt DateTime @default(now())
+}
+
+model BillingSession {
+  id         String               @id @default(uuid())
+  reference  String               @unique
+  provider   BillingProvider
+  status     BillingSessionStatus @default(PENDING)
+  amount     Int?
+  currency   String?              @default("USD")
+  payload    Json?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  userId     String
+  user       User                 @relation(fields: [userId], references: [id])
 }

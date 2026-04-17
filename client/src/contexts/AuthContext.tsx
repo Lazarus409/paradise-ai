@@ -23,11 +23,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token) {
-      setIsAuthenticated(true);
+    if (!token) {
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
     }
 
-    setIsLoading(false);
+    authAPI
+      .me()
+      .then(() => {
+        setIsAuthenticated(true);
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   /* =========================
@@ -57,9 +70,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (email: string, password: string) => {
     try {
-      await authAPI.register(email, password);
+      const response = await authAPI.register(email, password);
 
-      await login(email, password);
+      const token = response.data.token;
+
+      localStorage.setItem("token", token);
+
+      setIsAuthenticated(true);
 
       toast.success("Registration successful");
     } catch (error: any) {

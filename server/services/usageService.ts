@@ -2,7 +2,7 @@ import { db } from "../db";
 
 function currentMonth() {
   const now = new Date();
-  return `${now.getFullYear()}-${now.getMonth() + 1}`;
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
 export async function getUsage(userId: string) {

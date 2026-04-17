@@ -1,6 +1,4 @@
-import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
+import { verifyToken } from "../utils/jwt";
 
 export const authMiddleware = (req: any, res: any, next: any) => {
   const authHeader = req.headers.authorization;
@@ -13,8 +11,7 @@ export const authMiddleware = (req: any, res: any, next: any) => {
 
   try {
     const token = authHeader.split(" ")[1];
-
-    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyToken(token);
 
     req.user = {
       id: decoded.userId,

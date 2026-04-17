@@ -1,28 +1,15 @@
 import axios from "axios";
 
-/* 
-   BASE API CLIENT
- */
-
-export const api = axios.create({
-  baseURL: "/api",
-});
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-/* 
-   REQUEST INTERCEPTOR
-   (Attach JWT)
- */
-
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem("token");
+  config.headers = config.headers ?? {};
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -30,10 +17,6 @@ apiClient.interceptors.request.use(config => {
 
   return config;
 });
-
-/* 
-   RESPONSE INTERCEPTOR
- */
 
 apiClient.interceptors.response.use(
   response => response,
@@ -47,49 +30,33 @@ apiClient.interceptors.response.use(
   }
 );
 
-/* 
-   AUTH API
- */
-
 export const authAPI = {
   register: (email: string, password: string) =>
-    apiClient.post("/api/auth/register", {
-      email,
-      password,
-    }),
+    apiClient.post("/auth/register", { email, password }),
 
   login: (email: string, password: string) =>
-    apiClient.post("/api/auth/login", {
-      email,
-      password,
-    }),
+    apiClient.post("/auth/login", { email, password }),
+
+  me: () => apiClient.get("/auth/me"),
 };
 
-/* 
-   BILLING API
- */
-
-export const billingAPI = {
-  checkout: () => apiClient.post("/api/billing/checkout"),
-  usage: () => apiClient.get("/api/usage"),
+export const usageAPI = {
+  status: () => apiClient.get("/usage"),
 };
-
-/* 
-   PRESENTATIONS API
- */
 
 export const presentationAPI = {
-  generate: (prompt: string) =>
-    apiClient.post("/api/presentations/generate", { prompt }),
+  generate: (prompt: string, workspaceId?: string) =>
+    apiClient.post("/presentations/generate", { prompt, workspaceId }),
 
-  list: () => apiClient.get("/api/presentations"),
+  list: () => apiClient.get("/presentations"),
 
-  get: (id: string) => apiClient.get(`/api/presentations/${id}`),
+  get: (id: string) => apiClient.get(`/presentations/${id}`),
 
-  update: (id: string, data: any) =>
-    apiClient.put(`/api/presentations/${id}`, data),
+  update: (id: string, data: any) => apiClient.put(`/presentations/${id}`, data),
 
-  delete: (id: string) => apiClient.delete(`/api/presentations/${id}`),
+  delete: (id: string) => apiClient.delete(`/presentations/${id}`),
+
+  share: (id: string) => apiClient.post(`/presentations/${id}/share`),
 };
 
 export default apiClient;

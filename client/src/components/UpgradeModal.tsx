@@ -1,28 +1,35 @@
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { billingAPI } from "@/lib/api";
+import { useLocation } from "wouter";
 
 export default function UpgradeModal({ open, onClose }: any) {
-  const handleUpgrade = async () => {
-    const res = await billingAPI.checkout();
-    window.location.href = res.data.url;
-  };
+  const [, setLocation] = useLocation();
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <div className="p-8 bg-card rounded-2xl w-100">
-        <h2 className="text-2xl font-bold mb-4">Upgrade to Pro</h2>
+      <DialogContent className="w-full max-w-md rounded-3xl border border-border/70 bg-card p-0 shadow-2xl">
+        <div className="p-6">
+          <h2 className="text-2xl font-semibold">Free access</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Everything in the workspace is included after login. No upgrade
+            flow, no billing page.
+          </p>
 
-        <ul className="space-y-2 text-muted-foreground mb-6">
-          <li>✓ Unlimited generations</li>
-          <li>✓ Team collaboration</li>
-          <li>✓ Export to PDF & PPT</li>
-        </ul>
+          <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
+            <li>• Unlimited generations</li>
+            <li>• Team collaboration</li>
+            <li>• Export-ready presentation workflows</li>
+            <li>• Dashboard access after login</li>
+          </ul>
 
-        <Button onClick={handleUpgrade} className="w-full">
-          Upgrade Now
-        </Button>
-      </div>
+          <Button
+            onClick={() => setLocation("/dashboard")}
+            className="mt-6 w-full rounded-2xl"
+          >
+            Continue to dashboard
+          </Button>
+        </div>
+      </DialogContent>
     </Dialog>
   );
 }

@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "./auth";
-import { db } from "./db";
+import { Response, NextFunction } from "express";
+import { verifyToken } from "./utils/jwt";
 
 /* =========================
    AUTH MIDDLEWARE
@@ -37,22 +36,5 @@ export async function enforceQuota(
   res: Response,
   next: NextFunction
 ) {
-  const month = new Date().toISOString().slice(0, 7);
-
-  const usage = await db.usageLog.findFirst({
-    where: {
-      userId: req.user.id,
-      month,
-    },
-  });
-
-  const FREE_LIMIT = 3;
-
-  if (usage && usage.count >= FREE_LIMIT) {
-    return res.status(403).json({
-      detail: "Monthly quota reached. Upgrade required.",
-    });
-  }
-
   next();
 }

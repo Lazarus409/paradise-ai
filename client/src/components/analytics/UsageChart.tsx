@@ -9,7 +9,7 @@ import {
 
 export default function UsageChart({ data }: any) {
   return (
-    <div className="w-full h-75">
+    <div className="w-full h-72">
       <ResponsiveContainer>
         <LineChart data={data}>
           <XAxis dataKey="month" />
